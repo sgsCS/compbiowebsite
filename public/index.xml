@@ -98,6 +98,21 @@ Follow the following steps:
     </item>
     
     <item>
+      <title></title>
+      <link>/sidsresume/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/sidsresume/</guid>
+      <description>SIDDARTH SATISH sgsatish@utexas.edu 5418 Manor Drive • Sugar Land, TX 77479 • ( 281 ) 202 - 9281 Github.com/sgsCS
+EDUCATION
+The University of Texas at Austin
+Bachelor of Science, Computational Biology Dec 2020 Certificate: Elements of Computing Math and CS GPA: 3. 5
+EXPERIENCE
+Barrick Lab (breseq) – Undergraduate Research Assistant; Austin, TX Sept 2019 - Present
+ Upgraded breseq HTML output by implementing new interactivity and dynamic options to a static page Designed algorithm to parallelize breseq execution and output to increase efficiency of the program Modified existing codebase to implement new features to breseq output  Fort Bend Geriatrics – Interactive Website Design; Houston, TX December 2019 – Present</description>
+    </item>
+    
+    <item>
       <title>Project 2: Modeling, Testing, and Predicting</title>
       <link>/project2/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

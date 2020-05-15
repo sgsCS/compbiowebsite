@@ -14,7 +14,7 @@ My name is Siddarth Satish and I am a computational biology major at the Univers
 
 Here you can find my current resume and contact information:
 
-- [Siddarth Satish](/resume/)
+- [Siddarth Satish](/sidsresume/)
 
 - [github: sgsCS](https://github.com/sgsCS)
 
