@@ -12,6 +12,24 @@
     
     
     <item>
+      <title>Python and R: Marriage or Divorce?</title>
+      <link>/blog/pythonandr/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/pythonandr/</guid>
+      <description>Python and R are both simple, effective and well-developed programming languages that can perform an infinitie amount of tasks ranging from web development to data mining and analysis. Any task can be done by using exclusively python or R. But like Hannah Montana would say, you put them all together and you get the best of both worlds. Using R and Python together can end up working really well.</description>
+    </item>
+    
+    <item>
+      <title>About Me</title>
+      <link>/resume/</link>
+      <pubDate>Sun, 02 Oct 2016 22:55:05 -0400</pubDate>
+      
+      <guid>/resume/</guid>
+      <description>About me My name is Siddarth Satish and I am a computational biology major at the University of Texas at Austin. I began my college career as a pre-med student interested in becoming a physician but I then became fasccinated in data science and decided to pursue a path in with more focus in that area. I am currently pursuing a certificate in elements of computing which supplments my degree with programming knowledge.</description>
+    </item>
+    
+    <item>
       <title>Projects</title>
       <link>/projects/</link>
       <pubDate>Sun, 02 Oct 2016 22:55:05 -0400</pubDate>

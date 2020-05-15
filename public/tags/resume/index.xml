@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>resume on Siddarth&#39;s Portfolio</title>
+    <link>/tags/resume/</link>
+    <description>Recent content in resume on Siddarth&#39;s Portfolio</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Sun, 02 Oct 2016 22:55:05 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/resume/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About Me</title>
+      <link>/resume/</link>
+      <pubDate>Sun, 02 Oct 2016 22:55:05 -0400</pubDate>
+      
+      <guid>/resume/</guid>
+      <description>About me My name is Siddarth Satish and I am a computational biology major at the University of Texas at Austin. I began my college career as a pre-med student interested in becoming a physician but I then became fasccinated in data science and decided to pursue a path in with more focus in that area. I am currently pursuing a certificate in elements of computing which supplments my degree with programming knowledge.</description>
+    </item>
+    
+  </channel>
+</rss>

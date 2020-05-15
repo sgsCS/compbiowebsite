@@ -1,0 +1,29 @@
+---
+title: "Python and R: Marriage or Divorce?"
+author: "Siddarth Satish"
+date: 2020-05-15
+categories: ["R"]
+tags: ["R Markdown", "plot", "python", "R", "data science"]
+---
+
+Python and R are both simple, effective and well-developed programming languages that can perform an infinitie amount of tasks ranging from web development to data mining and analysis. Any task can be done by using exclusively python or R. But like Hannah Montana would say, you put them all together and you get the best of both worlds. Using R and Python together can end up working really well. 
+
+
+## Python
+Python as a language for data science is impressive but unlike R, there are many packages that you can choose from like scikit and such and it can become difficult to choose what to use for whatever analysis you need to do. 
+
+
+
+Here we can see that using python we can run an anova and visualize the data also. Comparatively to R however, this process can be done easier with 2 lines instead of the many lines of code here especially with the imports at the top. 
+
+## R
+
+
+
+
+## What they can do together
+
+
+
+
+
