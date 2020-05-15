@@ -1,0 +1,263 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "Siddarth Satish sgs2338"
+date: ''
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(lmtest)
+library(sandwich)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+```
+
+## Data
+
+The data I am using is a data set of patients that had malignant melanoma during the period of 1962 to 1977. Each of these patients had surgery performed on them to remove the tumor. This data is a result of a study done by the Department of Plastic Surgery, University Hospital of Odense, Denmark. There are 7 variables available: time, status, sex, age, year, thickness, and ulcer. Time is the number of days the patient survuved after the operation. The status is the patients status at the end of the study in 3 options: they died from the melanoma, they were sill alive, or they died from an unrelated cause. Sex is either male or female. The age is the patients age at the time of the operation. Year is the year of the operation. Thickness is the thickness in milimeters of the tumor. Ulcer is the presence of ulceration. There are 205 observations or 205 patients in this study.  
+
+```{R}
+
+library(MASS)
+melanoma <- Melanoma
+head(melanoma)
+```
+
+## Manova Testing
+
+A one-way MANOVA was conducted to determine the effect of the status (dead from melanoma, alive, dead from unknown cause) on five dependent variables (time, age, sex, year, thickness). The overall manova was siginificant so Univariate ANOVAs for each dependent variable were conducted as follow-up tests to the
+MANOVA, using the Bonferroni method for controlling Type I error rates for multiple comparisons. Only time and thickness were found to be significant after the Univariate ANOVAs. I then performed post hoc analysis by conducting pairwise comparisons to determine which status differed in time and thickess. All three statuses were found to differ significantly from each other in terms of thse 2 measures after adjusting for multiple comparisons (bonferroni = .05/15 = 0.003333333). 15 Tests were performed (1 MANOVA, 5 ANOVA, 15 t tests). The probability of a type 1 error occuring is 1-.95^15 which is 0.5367088. Most of the assumptions for the MANOVA test are probably not going to be met. In a practical sense variables are rarely going to have normality or have certain linear relationships. However this data does not have univariate or multivariate outliers so that assumption is met. 
+
+
+
+```{R}
+man1 <-manova(cbind(time, age, sex, year, thickness)~status, data=melanoma)
+summary(man1) # overall manova is significant 
+
+summary.aov(man1) # time, year, and thickness are significant
+
+pairwise.t.test(melanoma$time, melanoma$status, p.adj = "none")
+pairwise.t.test(melanoma$age, melanoma$status, p.adj = "none")
+pairwise.t.test(melanoma$sex, melanoma$status, p.adj = "none")
+pairwise.t.test(melanoma$year, melanoma$status, p.adj = "none")
+pairwise.t.test(melanoma$thickness, melanoma$status, p.adj = "none")
+
+1-.95^15 # = 0.5367088 which is the probability of at least one type I error having done 15 tests
+.05/15 # = 0.003333333 which is the Bonferonni correction
+
+
+
+```
+
+## Randomization Test
+A randomization test was performed which generated 5000 F statistics which were compared to the original F stat for time against status. None of the 5000 F statistics generated under the null hypothesis were bigger than the actual F statistic. The null hypothesis is that all the group means are the same. The alternative hypothesis is that the group means are different. This means we reject the null hypothesis and conclude our groups differ. The null hypothesis is that all the group means are the same. The alternative hypothesis is that the group means are different.
+
+```{R}
+obs_F<-22.543  #this is our observed F-statistic
+
+Fs<-replicate(5000,{ #do everything in curly braces 5000 times and save the output
+new<-melanoma%>%mutate(time=sample(time)) #randomly permute response variable (time)
+
+#compute the F-statistic by hand
+SSW<- new%>%group_by(status)%>%summarize(SSW=sum((time-mean(time))^2))%>%
+summarize(sum(SSW))%>%pull
+
+SSB<- new%>%mutate(mean=mean(time))%>%group_by(status)%>%mutate(groupmean=mean(time))%>%
+summarize(SSB=sum((mean-groupmean)^2))%>%summarize(sum(SSB))%>%pull
+
+(SSB/1)/(SSW/203) #compute F statistic 
+})
+
+hist(Fs, prob=T); abline(v = obs_F, col="red",add=T)
+
+mean(Fs>obs_F)
+
+```
+
+## Linear Regression Model
+The coefficients for our model show that time and the interaction between time and thickness show a positive correlation to status which is what we are measuring. Thickness, however, shows a negative correlation to status. We check the assumptions graphically and they are met, however the normality assumption is not perfect. After robust standard errors the coefficients do not change much. Overall, timea and thickness independently were significant but just barely under the .05 threshold. After bootsrapping though, thickness becomes positive instead of negative in the previous model. 
+
+```{R}
+fit<-lm(status ~ time * thickness, data=melanoma) # Linear regression Model
+summary(fit)
+
+ggplot(melanoma,aes(time,thickness,color=status))+geom_point() # regression graph
+
+resids<-fit$residuals
+fitvals<-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red')# linearity 
+
+ggplot()+geom_histogram(aes(resids), bins=20) # normality assumption
+ggplot()+geom_qq(aes(sample=resids))
+
+
+coeftest(fit, vcov = vcovHC(fit))[,1:2] # HeteroskedasticityRobustStandardErrors
+
+# Bootstrapping
+
+samp_distn<-replicate(5000, {
+boot_dat <- sample_frac(melanoma, replace=T) #bootstrap your data
+tempfit <- lm(status ~ time * thickness, data=boot_dat) #fit model
+coef(tempfit) #save coefs
+})
+samp_distn %>% t %>% as.data.frame %>% summarize_all(sd) #bootstrap SE
+
+
+
+
+```
+
+## Logistic Regression
+For this logistic regression we are preditcting survival from time and thickness. Survival is a binary variable based on the status variable. The status variable had 3 outcomes: 1 being dead from melanoma, 2 survived and alive, 3 being dead from some other cause other than melanoma. The survival variable is 1 for those who died from melanoma, and 2 from those who are alive or died from another cause. I have it set this way because we want to predict what caused their death and those who died from other causes arent going to show the same patterns as those who died from melanoma. Time shows an inverse relationship to survival while thickness showed a positive correlation. From the correlation matrix we can see that the accuracy is 0.8243902, the sensitivity is 0.9324324, the specificity is 0.5438596 and the precision is 0.8414634. After plotting ROC, our AUC comes out to 0.8405642, which is not overly high but is good. A 10 fold CV is done and the specs are reported after that. 
+
+```{R}
+melanoma_s <- melanoma %>% mutate(survival = ifelse(status == 1, 1, 0)) #create binary variable 
+melanoma <- melanoma %>% mutate(survival = ifelse(status == 1, 1, 0))
+logfit<-glm(survival~time+thickness,data=melanoma_s,family=binomial(link="logit")) # logistic regression
+coeftest(logfit)
+exp(coef(logfit))
+
+melanoma_s$logit<-predict(logfit)
+melanoma_s$prob<-predict(logfit,type="response") #get predicted probabilities
+melanoma_s$predicted<-ifelse(melanoma_s$prob>.5,1,0) #predicted outcomes
+table(truth=melanoma_s$survival, prediction=melanoma_s$predicted)%>%addmargins # confusion matrix
+(138+31)/205 #accuracy
+138/148 # Sensitivity (TPR)
+31/57 # tnr (specificity)
+138/164 # ppv (precision)
+
+melanoma_s$outcome<-factor(melanoma_s$survival,levels=c("1","0"))
+melanoma_s%>%ggplot()+geom_density(aes(logit,color=outcome,fill=outcome), alpha=.4)+ #outcome plot
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("logit (log-odds)")+
+  geom_rug(aes(logit,color=outcome))
+
+
+# ROC AND AUC
+library(plotROC)
+ROCplot<-ggplot(melanoma_s)+geom_roc(aes(d=survival,m=prob), n.cuts=0) 
+
+ROCplot # ROC PLOT
+calc_auc(ROCplot) # 0.8405642		AUC
+
+class_diag <- function(probs,truth){
+  
+  #CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+
+## 10-fold CV
+
+set.seed(1234)
+k=10 #choose number of folds
+
+data<-melanoma_s[sample(nrow(melanoma_s)),] #randomly order rows
+folds<-cut(seq(1:nrow(melanoma_s)),breaks=k,labels=F) #create folds
+
+diags<-NULL
+for(i in 1:k){
+  ## Create training and test sets
+  train<-data[folds!=i,] 
+  test<-data[folds==i,]
+  
+  truth<-test$survival ## Truth labels for fold i
+  
+  ## Train model on training set (all but fold i)
+  fit<-glm(survival~thickness,data=melanoma_s,family="binomial")
+  
+  ## Test model on test set (fold i) 
+  probs<-predict(fit,newdata = test,type="response")
+  
+  ## Get diagnostics for fold i
+  diags<-rbind(diags,class_diag(probs,truth))
+}
+
+
+summarize_all(diags,mean) #average diagnostics across all k folds
+
+```
+
+## LASSO Regression
+Finally we come to the LASSO regression. I determined from the lasso doefficients that using year, time, and ulcer as predictors was the best. after running a 10 fold CV on this lasso model the AUC came out to be 0.9406375, which is very strong indicating that these are good predictors for survival. 
+
+```{R}
+library(glmnet)
+melanoma_l <- subset(melanoma, select = -c(status))
+y<-as.matrix(melanoma_l$survival) #grab response
+x<-model.matrix(survival~.,data=melanoma_l)[,-1] #grab predictors
+head(x)
+
+cv<-cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+
+# CV Lasso Model
+set.seed(1234)
+k=10
+
+data_l <- melanoma_l %>% sample_frac #put rows of dataset in random order
+folds_l <- ntile(1:nrow(data_l),n=10) #create fold labels
+
+diags<-NULL
+for(i in 1:k){
+  train_l <- data_l[folds!=i,] #create training set (all but fold i)
+  test_l <- data_l[folds==i,] #create test set (just fold i)
+  
+  truth_l <- test_l$survival #save truth labels from fold i
+  
+  fit_l <- glm(survival~year+time+ulcer, data=train, family="binomial")
+  
+  probs_l <- predict(fit_l, newdata=test_l, type="response")
+  
+  diags<-rbind(diags,class_diag(probs_l,truth_l))
+}
+
+diags%>%summarize_all(mean)
+
+
+```
+
+
+
