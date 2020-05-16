@@ -86,13 +86,64 @@
 <div id="python" class="section level2">
 <h2>Python</h2>
 <p>Python as a language for data science is impressive but unlike R, there are many packages that you can choose from like scikit and such and it can become difficult to choose what to use for whatever analysis you need to do.</p>
-<p>Here we can see that using python we can run an anova and visualize the data also. Comparatively to R however, this process can be done easier with 2 lines instead of the many lines of code here especially with the imports at the top.</p>
+<pre class="python"><code>
+my_seq1 = &quot;ATCATCATG&quot;
+my_seq2 = &quot;CAGCCCAATCAGGCTCTACTGCCACTAAACTTACGCAGGATATATTTACGCCGACGTACT&quot;
+
+# function that ocunts 3mers 
+def count_mers(string):
+    kmers = {}
+    subs = [string[s:s+3] for s in range(len(string)) if len(string[s:s+3]) &gt; 2]
+    for seq in subs:
+        if seq in kmers:
+            kmers[seq] += 1
+        else:
+            kmers[seq] = 1
+    print(kmers)
+
+print(&quot;3 count k-mers in seq 1 :: &quot;) </code></pre>
+<pre><code>## 3 count k-mers in seq 1 ::</code></pre>
+<pre class="python"><code>count_mers(my_seq1)</code></pre>
+<pre><code>## {&#39;ATC&#39;: 2, &#39;TCA&#39;: 2, &#39;CAT&#39;: 2, &#39;ATG&#39;: 1}</code></pre>
+<pre class="python"><code>print(&quot;3 count k-mers in seq 2 :: &quot;)</code></pre>
+<pre><code>## 3 count k-mers in seq 2 ::</code></pre>
+<pre class="python"><code>count_mers(my_seq2)</code></pre>
+<pre><code>## {&#39;CAG&#39;: 3, &#39;AGC&#39;: 1, &#39;GCC&#39;: 3, &#39;CCC&#39;: 1, &#39;CCA&#39;: 2, &#39;CAA&#39;: 1, &#39;AAT&#39;: 1, &#39;ATC&#39;: 1, &#39;TCA&#39;: 1, &#39;AGG&#39;: 2, &#39;GGC&#39;: 1, &#39;GCT&#39;: 1, &#39;CTC&#39;: 1, &#39;TCT&#39;: 1, &#39;CTA&#39;: 2, &#39;TAC&#39;: 4, &#39;ACT&#39;: 4, &#39;CTG&#39;: 1, &#39;TGC&#39;: 1, &#39;CAC&#39;: 1, &#39;TAA&#39;: 1, &#39;AAA&#39;: 1, &#39;AAC&#39;: 1, &#39;CTT&#39;: 1, &#39;TTA&#39;: 2, &#39;ACG&#39;: 3, &#39;CGC&#39;: 2, &#39;GCA&#39;: 1, &#39;GGA&#39;: 1, &#39;GAT&#39;: 1, &#39;ATA&#39;: 2, &#39;TAT&#39;: 2, &#39;ATT&#39;: 1, &#39;TTT&#39;: 1, &#39;CCG&#39;: 1, &#39;CGA&#39;: 1, &#39;GAC&#39;: 1, &#39;CGT&#39;: 1, &#39;GTA&#39;: 1}</code></pre>
+<p>Here we use python to determine the number of k-mers from a read of DNA. A k-mer is all the possible sequences of length k in a DNA read. This example finds all the ‘3-mers’ in 2 DNA sequences and prints them out with the count for each 3-mer.</p>
 </div>
 <div id="r" class="section level2">
 <h2>R</h2>
+<p>Compared to python, R was developed for data science. So many of the implicit packages are made for doing different analyses on data as well as visualization of that data. One of the best external packages for data visualization is ggplot2 which cam create superb visualizations of data.</p>
+<pre class="r"><code>library(ggplot2)
+msleep1&lt;-msleep[!is.na(msleep$vore),]
+msleep1$size &lt;- ifelse(msleep1$bodywt&lt;median(msleep1$bodywt),&quot;Small&quot;,&quot;Large&quot;)
+ 
+ggplot(msleep1, aes(order))+
+geom_bar(aes(fill=order))+
+coord_flip()+
+theme(legend.position=&quot;none&quot;)</code></pre>
+<p><img src="/blog/pythonandr_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Here we take the msleep data which documents sleep habits of different mammals and we can display this data colorfully using ggplot.</p>
 </div>
 <div id="what-they-can-do-together" class="section level2">
 <h2>What they can do together</h2>
+<p>Together python and R can do magical things. Using reticulate, an R package, python and R chuncks can communicte together.</p>
+<pre class="r"><code>library(reticulate)
+use_condaenv(&quot;r-reticulate&quot;)
+py_available(TRUE)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>autos = cars</code></pre>
+<pre class="python"><code>import pandas
+autos_py = r.autos
+autos_py[&#39;time&#39;] = autos_py[&#39;dist&#39;]/autos_py[&#39;speed&#39;]</code></pre>
+<pre class="r"><code>plot(py$autos_py)</code></pre>
+<p><img src="/blog/pythonandr_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+Here we use an R dataset, cars, and use it in python to do a simple calcuation. After saving it in a variable it can be accessed by another R chunk and a plot can be made. This is of course a simple showing of the capabilites of using these 2 languages together.</p>
+</div>
+<div id="final-thoughts" class="section level2">
+<h2>Final Thoughts</h2>
+<p><img src="/static/img/pythonr.png" /></p>
+<p>I personally have spent a lot more time with python than I have with R so I am usually biased in that direction. However, both programs have their specialties and in conjuction can be used to do fantastic things.</p>
 </div>
 
               <hr>

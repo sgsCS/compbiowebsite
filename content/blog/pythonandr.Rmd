@@ -12,18 +12,75 @@ Python and R are both simple, effective and well-developed programming languages
 ## Python
 Python as a language for data science is impressive but unlike R, there are many packages that you can choose from like scikit and such and it can become difficult to choose what to use for whatever analysis you need to do. 
 
+```{python}
 
+my_seq1 = "ATCATCATG"
+my_seq2 = "CAGCCCAATCAGGCTCTACTGCCACTAAACTTACGCAGGATATATTTACGCCGACGTACT"
 
-Here we can see that using python we can run an anova and visualize the data also. Comparatively to R however, this process can be done easier with 2 lines instead of the many lines of code here especially with the imports at the top. 
+# function that ocunts 3mers 
+def count_mers(string):
+    kmers = {}
+    subs = [string[s:s+3] for s in range(len(string)) if len(string[s:s+3]) > 2]
+    for seq in subs:
+        if seq in kmers:
+            kmers[seq] += 1
+        else:
+            kmers[seq] = 1
+    print(kmers)
+
+print("3 count k-mers in seq 1 :: ") 
+count_mers(my_seq1)
+print("3 count k-mers in seq 2 :: ")
+count_mers(my_seq2)
+
+```
+
+Here we use python to determine the number of k-mers from a read of DNA. A k-mer is all the possible sequences of length k in a DNA read. This example finds all the '3-mers' in 2 DNA sequences and prints them out with the count for each 3-mer.
 
 ## R
+Compared to python, R was developed for data science. So many of the implicit packages are made for doing different analyses on data as well as visualization of that data. One of the best external packages for data visualization is ggplot2 which cam create superb visualizations of data.
 
+```{R}
+library(ggplot2)
+msleep1<-msleep[!is.na(msleep$vore),]
+msleep1$size <- ifelse(msleep1$bodywt<median(msleep1$bodywt),"Small","Large")
+ 
+ggplot(msleep1, aes(order))+
+geom_bar(aes(fill=order))+
+coord_flip()+
+theme(legend.position="none")
 
+```
 
+Here we take the msleep data which documents sleep habits of different mammals and we can display this data colorfully using ggplot. 
 
 ## What they can do together
+Together python and R can do magical things. Using reticulate, an R package, python and R chuncks can communicte together. 
+
+```{R}
+library(reticulate)
+use_condaenv("r-reticulate")
+py_available(TRUE)
+autos = cars
+```
+
+```{python}
+import pandas
+autos_py = r.autos
+autos_py['time'] = autos_py['dist']/autos_py['speed']
+```
+
+```{R}
+plot(py$autos_py)
+
+``` 
+Here we use an R dataset, cars, and use it in python to do a simple calcuation. After saving it in a variable it can be accessed by another R chunk and a plot can be made. This is of course a simple showing of the capabilites of using these 2 languages together.
 
 
+## Final Thoughts
+![](/static/img/pythonr.png)
+
+I personally have spent a lot more time with python than I have with R so I am usually biased in that direction. However, both programs have their specialties and in conjuction can be used to do fantastic things. 
 
 
 
