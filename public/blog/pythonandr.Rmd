@@ -78,7 +78,7 @@ Here we use an R dataset, cars, and use it in python to do a simple calcuation. 
 
 
 ## Final Thoughts
-![](/static/img/pythonr.png)
+![](pythonr.png)
 
 I personally have spent a lot more time with python than I have with R so I am usually biased in that direction. However, both programs have their specialties and in conjuction can be used to do fantastic things. 
 
